@@ -41,14 +41,13 @@ class OnePageCRMAPI():
         '''
 
         url = 'https://app.onepagecrm.com/api/v3/contacts.json'
-        payload = ''
-        headers = self.construct_headers('GET', url, payload)
-        response = requests.get(url, data=json.dumps(payload), headers=headers)
+        headers = self.construct_headers('GET', url)
+        response = requests.get(url, headers=headers)
 
         return response.json()['data']['contacts']
 
 
-    def construct_headers(self, method, url, request_body):
+    def construct_headers(self, method, url, request_body = None):
         '''\
         Compile necessary headers for communicating with OnePageCRM\
         '''
@@ -61,30 +60,30 @@ class OnePageCRMAPI():
                 'Content-Type': 'application/json',
                 'accept': 'application/json'}
 
-    def onepagecrm_signature(self, timestamp, request_type, request_url, request_body = ''):
+    def onepagecrm_signature(self, timestamp, request_type, request_url, request_body = None):
         '''\
         Creates the signature needed for the Headers\
         '''
 
         decoded_api_key = b64decode(self.api_key)
 
-        request_url_hash = sha1(request_url.encode('utf-8')).hexdigest()
-
-        request_body_hash = sha1(request_body.encode('utf-8')).hexdigest()
+        request_url_hash = sha1(request_url.encode('utf-8')).hexdigest() 
 
         signature_message = "%s.%0.f.%s.%s" % (self.user_id, timestamp,
           request_type.upper(), request_url_hash)
 
-        signature_message += ('.' + request_body_hash) if request_body != '' else ''
+        if request_body:
+            request_body_hash = sha1(request_body.encode('utf-8')).hexdigest()
+            signature_message += ('.' + request_body_hash)
 
         return hmac.new(decoded_api_key,signature_message.encode('utf-8'),sha256).hexdigest()
 
 
 
-username = 'xxxxxxxx' # Insert your username here
-password = 'xxxxxxxx' # Insert your password here
+username = 'xxxxxx' # Insert your username here
+password = 'xxxxxx' # Insert your password here
 
 sample = OnePageCRMAPI(username, password)
 
 contacts = sample.get_contacts()
-print contacts
+print json.dumps(contacts, indent=4, sort_keys=True)
