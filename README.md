@@ -9,4 +9,4 @@ You can use this script as a starting point to create your own API client and in
 Please see developer.onepagecrm.com for full API details.
 
 ## Usage
-Add your username and password and then run this script.
+Add your user_id and api_key and then run this script.

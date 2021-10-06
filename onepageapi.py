@@ -21,9 +21,13 @@ class OnePageCRMAPI():
         Returns a list of contacts in JSON format\
         '''
         url = 'https://app.onepagecrm.com/api/v3/contacts.json'
+
         response = requests.get(url, auth=(user_id, api_key))
 
-        return response.json()['data']['contacts']
+        if response.json()['status'] == 0:
+            return response.json()['data']['contacts']
+        else:
+            raise Exception(response.json()['error_message'])
 
 user_id = 'xxxxxx' # Insert your user_id here
 api_key = 'xxxxxx' # Insert your api_key here
